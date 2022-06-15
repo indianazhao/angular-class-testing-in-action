@@ -15,7 +15,10 @@ describe('FrontComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         FrontComponent,
-        FrontService,
+        {
+          provide: FrontService,
+          useValue: createSpyFromClass(FrontService)
+        },
         {
           provide: RouterAdapterService,
           useValue: createSpyFromClass(RouterAdapterService)
@@ -23,9 +26,9 @@ describe('FrontComponent', () => {
       ]
     });
 
-    componentUnderTest = TestBed.get(FrontComponent);
-    frontServiceSpy = TestBed.get(FrontService);
-    routerSpy = TestBed.get(RouterAdapterService);
+    componentUnderTest = TestBed.inject(FrontComponent);
+    frontServiceSpy = TestBed.inject(FrontService) as Spy<FrontService>;
+    routerSpy = TestBed.inject(RouterAdapterService) as Spy<RouterAdapterService>;
   });
 
   describe('INIT', () => {
@@ -47,7 +50,7 @@ describe('FrontComponent', () => {
       });
     });
 
-    describe(`GIVEN there is a problem fetching the llamas 
+    describe(`GIVEN there is a problem fetching the llamas
               THEN show an error`, () => {
       Given(() => {
         frontServiceSpy.getFeaturedLlamas.and.rejectWith();

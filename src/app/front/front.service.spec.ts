@@ -48,8 +48,8 @@ describe('FrontService', () => {
     let fakeUserLlamaId: string;
     let fakeLlama: Llama;
 
+    // 把測試條件裡共通的 Given 內容抽出來
     Given(() => {
-      fakeLlama = createDefaultFakeLlama();
       serviceUnderTest.userLlama = createDefaultFakeLlama();
       fakeUserLlamaId = 'FAKE LLAMA USER ID';
       serviceUnderTest.userLlama.id = fakeUserLlamaId;
@@ -59,14 +59,33 @@ describe('FrontService', () => {
       serviceUnderTest.pokeLlama(fakeLlama);
     });
 
-    Then(() => {
+    describe('GIVEN llama with an empty pokeBy list THEN add user llama to the list', () => {
+      Given(() => {
+        fakeLlama = createDefaultFakeLlama();
+      });
 
-      const expectedChanges: Partial<Llama> = {
-        pokedByTheseLlamas: [fakeUserLlamaId],
-      };
-
-      expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+      Then(() => {
+        const expectedChanges: Partial<Llama> = {
+          pokedByTheseLlamas: [fakeUserLlamaId],
+        };
+        expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+      });
     });
+
+    describe('GIVEN llama with a filled pokeBy list THEN add user llama to the list', () => {
+      Given(() => {
+        fakeLlama = createDefaultFakeLlama();
+        fakeLlama.pokedByTheseLlamas = ['ANOTHER FAKE ID'];
+      });
+
+      Then(() => {
+        const expectedChanges: Partial<Llama> = {
+          pokedByTheseLlamas: ['ANOTHER FAKE ID', fakeUserLlamaId],
+        };
+        expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+      });
+    });
+
   });
 
 });

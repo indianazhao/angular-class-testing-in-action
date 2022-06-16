@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
-import { AnotherService } from './another.service';
-import { Llama } from './llama.model';
+import { LlamaRemoteService } from './llama-remote.service';
 import { HttpClient } from '@angular/common/http';
+import { Llama } from '../../_types/llama.type';
 
-describe('AnotherService', () => {
-  let serviceUnderTest: AnotherService;
+describe('LlamaRemoteService', () => {
+  let serviceUnderTest: LlamaRemoteService;
   let httpSpy: Spy<HttpClient>;
   let fakeLlamas: Llama[];
   let actualResult: any;
@@ -13,12 +13,12 @@ describe('AnotherService', () => {
   Given(() => {
     TestBed.configureTestingModule({
       providers: [
-        AnotherService,
+        LlamaRemoteService,
         { provide: HttpClient, useValue: createSpyFromClass(HttpClient) }
       ]
     });
 
-    serviceUnderTest = TestBed.get(AnotherService);
+    serviceUnderTest = TestBed.get(LlamaRemoteService);
     httpSpy = TestBed.get(HttpClient);
 
     fakeLlamas = undefined;

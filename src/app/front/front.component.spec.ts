@@ -1,4 +1,4 @@
-import { Llama } from './llama.model';
+import { Llama } from '../_types/llama.type';
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { FrontComponent } from './front.component';
 import { FrontService } from './front.service';
@@ -106,7 +106,7 @@ describe('FrontComponent', () => {
     });
 
     Then(() => {
-      expect(frontServiceSpy.poke).toHaveBeenCalledWith(fakeLlama);
+      expect(frontServiceSpy.pokeLlama).toHaveBeenCalledWith(fakeLlama);
     });
 
   });

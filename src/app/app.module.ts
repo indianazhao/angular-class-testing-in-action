@@ -4,7 +4,7 @@ import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { FrontComponent } from './front/front.component';
 import { HttpClientModule } from '@angular/common/http';
-import { AnotherService } from './front/another.service';
+import { LlamaRemoteService } from './_services/llama-remote/llama-remote.service';
 import { RouterModule } from '@angular/router';
 import { LlamaPageComponent } from './llama-page/llama-page.component';
 
@@ -20,9 +20,7 @@ import { LlamaPageComponent } from './llama-page/llama-page.component';
     FrontComponent,
     LlamaPageComponent
   ],
-  providers: [
-    AnotherService
-  ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

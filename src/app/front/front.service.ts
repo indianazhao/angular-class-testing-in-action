@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
-import { Llama } from './llama.model';
-import { AnotherService } from './another.service';
+import { Llama } from '../_types/llama.type';
+import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FrontService {
-  constructor(private anotherService: AnotherService) {}
+  constructor(private llamaRemoteService: LlamaRemoteService) {}
 
   getFeaturedLlamas(config?: any): Promise<Llama[]> {
 
-    return this.anotherService.getLlamasFromServer().toPromise();
+    return this.llamaRemoteService.getLlamasFromServer().toPromise();
   }
 
   // TODO: TEST
-  poke(llama: Llama) {
+  pokeLlama(llama: Llama) {
     throw new Error('Method not implemented.');
   }
 }

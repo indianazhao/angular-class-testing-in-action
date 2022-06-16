@@ -1,13 +1,13 @@
 import { FrontService } from './front.service';
 import { TestBed, fakeAsync } from '@angular/core/testing';
-import { Llama } from './llama.model';
-import { AnotherService } from './another.service';
+import { Llama } from '../_types/llama.type';
+import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 
 describe('FrontService', () => {
 
   let serviceUnderTest: FrontService;
-  let anotherServiceSpy: Spy<AnotherService>;
+  let llamaRemoteServiceSpy: Spy<LlamaRemoteService>;
   let fakeLlamas: Llama[];
   let actualResult: any;
 
@@ -15,12 +15,12 @@ describe('FrontService', () => {
     TestBed.configureTestingModule({
       providers: [
         FrontService,
-        {provide: AnotherService, useValue: createSpyFromClass(AnotherService)}
+        {provide: LlamaRemoteService, useValue: createSpyFromClass(LlamaRemoteService)}
       ]
     });
 
     serviceUnderTest = TestBed.get(FrontService);
-    anotherServiceSpy = TestBed.get(AnotherService);
+    llamaRemoteServiceSpy = TestBed.get(LlamaRemoteService);
 
     fakeLlamas = undefined;
     actualResult = undefined;
@@ -30,7 +30,7 @@ describe('FrontService', () => {
 
     Given(() => {
       fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
-      anotherServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
+      llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
     });
 
     When(fakeAsync( async () => {

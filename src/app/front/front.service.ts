@@ -12,4 +12,9 @@ export class FrontService {
 
     return this.anotherService.getLlamasFromServer().toPromise();
   }
+
+  // TODO: TEST
+  poke(llama: Llama) {
+    throw new Error('Method not implemented.');
+  }
 }

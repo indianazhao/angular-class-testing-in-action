@@ -34,4 +34,8 @@ export class FrontComponent implements OnInit {
   isListVisible(): boolean {
     return !!this.llamas && this.llamas.length > 0;
   }
+
+  poke(llama: Llama) {
+    this.frontService.poke(llama);
+  }
 }

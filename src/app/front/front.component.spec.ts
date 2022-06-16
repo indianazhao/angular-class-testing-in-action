@@ -1,3 +1,4 @@
+import { Llama } from './llama.model';
 import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
 import { FrontComponent } from './front.component';
 import { FrontService } from './front.service';
@@ -42,7 +43,7 @@ describe('FrontComponent', () => {
       Given(() => {
         frontServiceSpy.getFeaturedLlamas
           .mustBeCalledWith({ newest: true })
-          .resolveWith([{ id: 'FAKE ID', name: 'shai', imageFileName: 'fakeImage' }]);
+          .resolveWith([createDefaultFakeLlama()]);
       });
 
       Then(() => {
@@ -69,9 +70,7 @@ describe('FrontComponent', () => {
 
     describe('GIVEN there are llamas THEN return true', () => {
       Given(() => {
-        componentUnderTest.llamas = [
-          { id: 'FAKE ID', name: 'Billy', imageFileName: 'fakeImage.jpg' }
-        ];
+        componentUnderTest.llamas = [createDefaultFakeLlama()];
       });
       Then(() => {
         expect(actualResult).toEqual(true);
@@ -97,4 +96,23 @@ describe('FrontComponent', () => {
     });
   });
 
+  describe('Method: poke', () => {
+    let fakeLlama: Llama;
+    Given(() => {
+      fakeLlama = createDefaultFakeLlama();
+    });
+    When(() => {
+      componentUnderTest.poke(fakeLlama);
+    });
+
+    Then(() => {
+      expect(frontServiceSpy.poke).toHaveBeenCalledWith(fakeLlama);
+    });
+
+  });
+
 });
+
+function createDefaultFakeLlama() {
+  return { id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' };
+}

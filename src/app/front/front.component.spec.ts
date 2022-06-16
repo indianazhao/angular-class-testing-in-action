@@ -42,7 +42,7 @@ describe('FrontComponent', () => {
       Given(() => {
         frontServiceSpy.getFeaturedLlamas
           .mustBeCalledWith({ newest: true })
-          .resolveWith([{ name: 'shai', imageFileName: 'fakeImage' }]);
+          .resolveWith([{ id: 'FAKE ID', name: 'shai', imageFileName: 'fakeImage' }]);
       });
 
       Then(() => {
@@ -69,7 +69,9 @@ describe('FrontComponent', () => {
 
     describe('GIVEN there are llamas THEN return true', () => {
       Given(() => {
-        componentUnderTest.llamas = [{ name: 'Billy', imageFileName: 'fakeImage.jpg' }];
+        componentUnderTest.llamas = [
+          { id: 'FAKE ID', name: 'Billy', imageFileName: 'fakeImage.jpg' }
+        ];
       });
       Then(() => {
         expect(actualResult).toEqual(true);
@@ -95,18 +97,4 @@ describe('FrontComponent', () => {
     });
   });
 
-  describe('METHOD: goToLlamaPage', () => {
-    let fakeLlamaId: string;
-    Given(() => {
-      fakeLlamaId = 'FAKE ID';
-    });
-
-    When(() => {
-      componentUnderTest.goToLlamaPage(fakeLlamaId);
-    });
-
-    Then(() => {
-      expect(routerSpy.goToUrl).toHaveBeenCalledWith(`/llama/${fakeLlamaId}`);
-    });
-  });
 });

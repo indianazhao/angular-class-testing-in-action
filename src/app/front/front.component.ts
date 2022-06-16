@@ -1,3 +1,4 @@
+import { appRoutesNames } from './../app.routes.names';
 import { Component, OnInit } from '@angular/core';
 import { FrontService } from './front.service';
 import { Llama } from './llama.model';
@@ -9,7 +10,8 @@ import { RouterAdapterService } from '../_services/router-adapter/router-adapter
   styleUrls: ['./front.component.scss']
 })
 export class FrontComponent implements OnInit {
-  
+
+  llamaPageLink = `/${appRoutesNames.LLAMA_PAGE}`;
   llamas: Llama[];
   showErrorMessage: boolean;
 
@@ -31,9 +33,5 @@ export class FrontComponent implements OnInit {
 
   isListVisible(): boolean {
     return !!this.llamas && this.llamas.length > 0;
-  }
-
-  goToLlamaPage(llamaId: string) {
-    this.router.goToUrl(`/llama/${llamaId}`);
   }
 }

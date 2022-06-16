@@ -1,3 +1,4 @@
+import { APP_ROUTES } from './app.routes';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
@@ -12,10 +13,7 @@ import { LlamaPageComponent } from './llama-page/llama-page.component';
   imports: [
     BrowserModule,
     HttpClientModule,
-    RouterModule.forRoot([
-      {path: '', component: FrontComponent},
-      {path: 'llama/:id', component: LlamaPageComponent},
-    ])
+    RouterModule.forRoot(APP_ROUTES),
   ],
   declarations: [
     AppComponent,

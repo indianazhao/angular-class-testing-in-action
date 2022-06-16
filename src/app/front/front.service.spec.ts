@@ -44,4 +44,34 @@ describe('FrontService', () => {
 
   });
 
+  describe('METHOD: pokeLlama', () => {
+    let fakeUserLlamaId: string;
+    let fakeLlama: Llama;
+
+    Given(() => {
+      fakeLlama = createDefaultFakeLlama();
+      serviceUnderTest.userLlama = createDefaultFakeLlama();
+      fakeUserLlamaId = 'FAKE LLAMA USER ID';
+      serviceUnderTest.userLlama.id = fakeUserLlamaId;
+    });
+
+    When(() => {
+      serviceUnderTest.pokeLlama(fakeLlama);
+    });
+
+    Then(() => {
+
+      const expectedChanges: Partial<Llama> = {
+        pokedByTheseLlamas: [fakeUserLlamaId],
+      };
+
+      expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+    });
+  });
+
 });
+
+// 為什麼從 front.component.spec.ts 複製這個函式？而不是把它抽離出來讓其他測試檔案共用？作者認為這樣可以保持簡單，而且可以讓各自測試進行客製。
+function createDefaultFakeLlama() {
+  return { id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' };
+}

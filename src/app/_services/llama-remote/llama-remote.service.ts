@@ -14,4 +14,9 @@ export class LlamaRemoteService {
   getLlamasFromServer(): Observable<Llama[]> {
     return this.http.get<Llama[]>('/api/newestLlamas');
   }
+
+  // TODO: TEST
+  update(llamaId: string, changes: Partial<Llama>) {
+    throw new Error('Method not implemented.')
+  }
 }

@@ -6,6 +6,9 @@ import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.servi
   providedIn: 'root'
 })
 export class FrontService {
+
+  userLlama: Llama;
+
   constructor(private llamaRemoteService: LlamaRemoteService) {}
 
   getFeaturedLlamas(config?: any): Promise<Llama[]> {
@@ -15,6 +18,12 @@ export class FrontService {
 
   // TODO: TEST
   pokeLlama(llama: Llama) {
-    throw new Error('Method not implemented.');
+    const userLlamaId = this.userLlama.id;
+    const pokeByClone = llama.pokedByTheseLlamas ? llama.pokedByTheseLlamas.slice() : [];
+    pokeByClone.push(userLlamaId);
+
+    this.llamaRemoteService.update(llama.id, {
+      pokedByTheseLlamas: pokeByClone
+    })
   }
 }

@@ -1,13 +1,16 @@
+import { appRoutesNames } from './../app.routes.names';
 import { FrontService } from './front.service';
 import { TestBed, fakeAsync } from '@angular/core/testing';
+import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { Llama } from '../_types/llama.type';
 import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.service';
-import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
+import { RouterAdapterService } from '../_services/router-adapter/router-adapter.service';
 
 describe('FrontService', () => {
 
   let serviceUnderTest: FrontService;
   let llamaRemoteServiceSpy: Spy<LlamaRemoteService>;
+  let routerAdapterServiceSpy: Spy<RouterAdapterService>;
   let fakeLlamas: Llama[];
   let actualResult: any;
 
@@ -15,12 +18,14 @@ describe('FrontService', () => {
     TestBed.configureTestingModule({
       providers: [
         FrontService,
-        {provide: LlamaRemoteService, useValue: createSpyFromClass(LlamaRemoteService)}
+        {provide: LlamaRemoteService, useValue: createSpyFromClass(LlamaRemoteService)},
+        {provide: RouterAdapterService, useValue: createSpyFromClass(RouterAdapterService)},
       ]
     });
 
-    serviceUnderTest = TestBed.get(FrontService);
-    llamaRemoteServiceSpy = TestBed.get(LlamaRemoteService);
+    serviceUnderTest = TestBed.inject(FrontService);
+    llamaRemoteServiceSpy = TestBed.inject<any>(LlamaRemoteService);
+    routerAdapterServiceSpy = TestBed.inject<any>(RouterAdapterService);
 
     fakeLlamas = undefined;
     actualResult = undefined;
@@ -48,43 +53,56 @@ describe('FrontService', () => {
     let fakeUserLlamaId: string;
     let fakeLlama: Llama;
 
-    // 把測試條件裡共通的 Given 內容抽出來
-    Given(() => {
-      serviceUnderTest.userLlama = createDefaultFakeLlama();
-      fakeUserLlamaId = 'FAKE LLAMA USER ID';
-      serviceUnderTest.userLlama.id = fakeUserLlamaId;
-    });
-
     When(() => {
       serviceUnderTest.pokeLlama(fakeLlama);
     });
 
-    describe('GIVEN llama with an empty pokeBy list THEN add user llama to the list', () => {
+    describe('GIVEN user llama is empty THEN redirect to login', () => {
       Given(() => {
-        fakeLlama = createDefaultFakeLlama();
+        serviceUnderTest.userLlama = null;
       });
 
       Then(() => {
-        const expectedChanges: Partial<Llama> = {
-          pokedByTheseLlamas: [fakeUserLlamaId],
-        };
-        expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+        expect(routerAdapterServiceSpy.goToUrl).toHaveBeenCalledWith(`/${appRoutesNames.LOGIN}`);
       });
     });
 
-    describe('GIVEN llama with a filled pokeBy list THEN add user llama to the list', () => {
+    describe('GIVEN user llama exists', () => {
+      // 把測試條件裡共通的 Given 內容抽出來
       Given(() => {
-        fakeLlama = createDefaultFakeLlama();
-        fakeLlama.pokedByTheseLlamas = ['ANOTHER FAKE ID'];
+        serviceUnderTest.userLlama = createDefaultFakeLlama();
+        fakeUserLlamaId = 'FAKE LLAMA USER ID';
+        serviceUnderTest.userLlama.id = fakeUserLlamaId;
       });
 
-      Then(() => {
-        const expectedChanges: Partial<Llama> = {
-          pokedByTheseLlamas: ['ANOTHER FAKE ID', fakeUserLlamaId],
-        };
-        expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+      describe('GIVEN llama with an empty pokeBy list THEN add user llama to the list', () => {
+        Given(() => {
+          fakeLlama = createDefaultFakeLlama();
+        });
+
+        Then(() => {
+          const expectedChanges: Partial<Llama> = {
+            pokedByTheseLlamas: [fakeUserLlamaId],
+          };
+          expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+        });
+      });
+
+      describe('GIVEN llama with a filled pokeBy list THEN add user llama to the list', () => {
+        Given(() => {
+          fakeLlama = createDefaultFakeLlama();
+          fakeLlama.pokedByTheseLlamas = ['ANOTHER FAKE ID'];
+        });
+
+        Then(() => {
+          const expectedChanges: Partial<Llama> = {
+            pokedByTheseLlamas: ['ANOTHER FAKE ID', fakeUserLlamaId],
+          };
+          expect(llamaRemoteServiceSpy.update).toHaveBeenCalledWith(fakeLlama.id, expectedChanges);
+        });
       });
     });
+
 
   });
 

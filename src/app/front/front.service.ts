@@ -21,9 +21,12 @@ export class FrontService {
     return this.llamaRemoteService.getLlamasFromServer().toPromise();
   }
 
-  // TODO: TEST
+  // TODO: Handle errors
   pokeLlama(llama: Llama) {
-
+    if (!this.userLlama) {
+      this.routerAdapterService.goToUrl(`/${appRoutesNames.LOGIN}`);
+      return;
+    }
     const userLlamaId = this.userLlama.id;
     const pokeByClone = llama.pokedByTheseLlamas ? llama.pokedByTheseLlamas.slice() : [];
     pokeByClone.push(userLlamaId);

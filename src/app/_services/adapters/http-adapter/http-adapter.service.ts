@@ -9,7 +9,7 @@ export class HttpAdapterService {
   constructor() { }
 
   // TODO: TEST
-  patch(url: string, changes: Partial<Llama>) {
+  patch<T>(url: string, changes: Partial<Llama>): Promise<T> {
     throw new Error('Method not implemented.');
   }
 }

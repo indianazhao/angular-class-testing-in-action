@@ -1,4 +1,4 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { LlamaRemoteService, LLAMAS_REMOTE_PATH } from './llama-remote.service';
@@ -11,6 +11,7 @@ describe('LlamaRemoteService', () => {
   let httpAdapterServiceSpy: Spy<HttpAdapterService>;
   let fakeLlamas: Llama[];
   let actualResult: any;
+  let actualError: any;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -27,6 +28,7 @@ describe('LlamaRemoteService', () => {
 
     fakeLlamas = undefined;
     actualResult = undefined;
+    actualError = undefined;
   });
 
   describe('METHOD: getLlamasFromServer', () => {
@@ -61,14 +63,28 @@ describe('LlamaRemoteService', () => {
       }
     });
 
-    When(() => {
-      serviceUnderTest.update(fakeLlamaId, fakeLlamaChanges);
-    });
+    When(fakeAsync(async() => {
+      try {
+        await serviceUnderTest.update(fakeLlamaId, fakeLlamaChanges);
+      } catch (error) {
+        actualError = error;
+      }
+    }));
 
     Then(() => {
       const expectedUrl = `${LLAMAS_REMOTE_PATH}/${fakeLlamaId}`;
       expect(httpAdapterServiceSpy.patch).toHaveBeenCalledWith(expectedUrl, fakeLlamaChanges);
     });
 
+    describe('GIVEN update failed THEN rethrow the error', () => {
+      Given(() => {
+        // 因為給 patch 方法加上回傳為 Promise<T> 型別，所以可以使用 rejectWith()
+        httpAdapterServiceSpy.patch.and.rejectWith('FAKE ERROR');
+      });
+
+      Then(() => {
+        expect(actualError).toEqual('FAKE ERROR');
+      });
+    });
   });
 });

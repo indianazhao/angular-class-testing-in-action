@@ -22,8 +22,8 @@ export class LlamaRemoteService {
   }
 
   // TODO: TEST
-  update(llamaId: string, changes: Partial<Llama>) {
+  update(llamaId: string, changes: Partial<Llama>): Promise<Llama> {
     const url = `${LLAMAS_REMOTE_PATH}/${llamaId}`;
-    this.httpAdapterService.patch(url, changes);
+    return this.httpAdapterService.patch(url, changes);
   }
 }

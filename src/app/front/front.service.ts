@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { appRoutesNames } from './../app.routes.names';
-import { RouterAdapterService } from './../_services/router-adapter/router-adapter.service';
+import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
 import { Llama } from '../_types/llama.type';
 import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.service';
 

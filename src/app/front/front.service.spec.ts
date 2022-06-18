@@ -4,7 +4,7 @@ import { TestBed, fakeAsync } from '@angular/core/testing';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { Llama } from '../_types/llama.type';
 import { LlamaRemoteService } from '../_services/llama-remote/llama-remote.service';
-import { RouterAdapterService } from '../_services/router-adapter/router-adapter.service';
+import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
 
 describe('FrontService', () => {
 

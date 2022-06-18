@@ -2,7 +2,7 @@ import { appRoutesNames } from './../app.routes.names';
 import { Component, OnInit } from '@angular/core';
 import { FrontService } from './front.service';
 import { Llama } from '../_types/llama.type';
-import { RouterAdapterService } from '../_services/router-adapter/router-adapter.service';
+import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
 
 @Component({
   selector: 'ld-front',

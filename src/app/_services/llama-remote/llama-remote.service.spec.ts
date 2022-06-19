@@ -52,29 +52,44 @@ describe('LlamaRemoteService', () => {
 
   describe('METHOD: update', () => {
 
-    let fakeLlamaId: string;
-    let fakeLlamaChanges: Partial<Llama>;
-
-    Given(() => {
-      // 資料從 front.service.spec.ts 複製出來...
-      fakeLlamaId = 'FAKE ID';
-      fakeLlamaChanges = {
-        pokedByTheseLlamas: ['FAKE LLAMA USER ID'],
-      }
-    });
+    let fakeLlamaIdArg: string;
+    let fakeLlamaChangesArg: Partial<Llama>;
 
     When(fakeAsync(async() => {
       try {
-        await serviceUnderTest.update(fakeLlamaId, fakeLlamaChanges);
+        actualResult = await serviceUnderTest.update(fakeLlamaIdArg, fakeLlamaChangesArg);
       } catch (error) {
         actualError = error;
       }
     }));
 
-    Then(() => {
-      const expectedUrl = `${LLAMAS_REMOTE_PATH}/${fakeLlamaId}`;
-      expect(httpAdapterServiceSpy.patch).toHaveBeenCalledWith(expectedUrl, fakeLlamaChanges);
+    describe('GIVEN update was successful THEN return the updated llama', () => {
+      let expectedReturnedLlama: Llama;
+
+      Given(() => {
+        // 資料從 front.service.spec.ts 複製出來...
+        fakeLlamaIdArg = 'FAKE ID';
+        fakeLlamaChangesArg = {
+          pokedByTheseLlamas: ['FAKE LLAMA USER ID'],
+        }
+
+        expectedReturnedLlama = createDefaultFakeLlama();
+
+        // TODO: 目前這兩行沒加也無所謂，因為 expect 那邊也會成立。之後等 http adapter 的 patch 實作後，來看看不加上這兩行是否會出錯。
+        expectedReturnedLlama.id = fakeLlamaIdArg;
+        expectedReturnedLlama.pokedByTheseLlamas = ['FAKE LLAMA USER ID']
+
+        const expectedUrl = `${LLAMAS_REMOTE_PATH}/${fakeLlamaIdArg}`;
+        httpAdapterServiceSpy.patch
+          .mustBeCalledWith(expectedUrl, fakeLlamaChangesArg)
+          .resolveWith(expectedReturnedLlama);
+      });
+
+      Then(() => {
+        expect(actualResult).toEqual(expectedReturnedLlama);
+      });
     });
+
 
     describe('GIVEN update failed THEN rethrow the error', () => {
       Given(() => {
@@ -88,3 +103,7 @@ describe('LlamaRemoteService', () => {
     });
   });
 });
+
+function createDefaultFakeLlama() {
+  return { id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' };
+}

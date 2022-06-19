@@ -54,11 +54,15 @@ describe('LlamaRemoteService', () => {
 
     let fakeLlamaIdArg: string;
     let fakeLlamaChangesArg: Partial<Llama>;
+    let errorIsExpected: boolean;
 
     When(fakeAsync(async() => {
       try {
         actualResult = await serviceUnderTest.update(fakeLlamaIdArg, fakeLlamaChangesArg);
       } catch (error) {
+        if (!errorIsExpected) {
+          throw error;
+        }
         actualError = error;
       }
     }));
@@ -93,6 +97,8 @@ describe('LlamaRemoteService', () => {
 
     describe('GIVEN update failed THEN rethrow the error', () => {
       Given(() => {
+        errorIsExpected = true;
+
         // 因為給 patch 方法加上回傳為 Promise<T> 型別，所以可以使用 rejectWith()
         httpAdapterServiceSpy.patch.and.rejectWith('FAKE ERROR');
       });

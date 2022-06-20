@@ -54,6 +54,22 @@ describe('LoginComponent', () => {
       });
     });
 
+    describe('GIVEN form data is invalid THEN do not pass credentials to the service', () => {
+
+      Given(() => {
+        fakeCredentials = {
+          email: '',
+          password: '',
+        };
+
+        componentUnderTest.loginForm.setValue(fakeCredentials);
+      });
+
+      Then(() => {
+        expect(loginServiceSpy.login).not.toHaveBeenCalledWith(fakeCredentials);
+      });
+    });
+
   });
 
 });

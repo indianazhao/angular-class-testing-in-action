@@ -1,6 +1,6 @@
 import { LoginService } from './login.service';
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'ld-login',
@@ -10,8 +10,8 @@ import { FormControl, FormGroup } from '@angular/forms';
 export class LoginComponent implements OnInit {
 
   loginForm: FormGroup = new FormGroup({
-    email: new FormControl(),
-    password: new FormControl(),
+    email: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required]),
   });
 
   constructor(
@@ -23,8 +23,10 @@ export class LoginComponent implements OnInit {
 
   // 4
   handleLogin() {
-    const credentials = this.loginForm.value;
-    this.loginService.login(credentials);
+    if (this.loginForm.valid) {
+      const credentials = this.loginForm.value;
+      this.loginService.login(credentials);
+    }
   }
 
 }

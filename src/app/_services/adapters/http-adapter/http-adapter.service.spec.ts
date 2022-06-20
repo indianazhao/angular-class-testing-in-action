@@ -7,7 +7,7 @@ import { HttpAdapterService } from './http-adapter.service';
 import serverMock from 'xhr-mock';
 
 describe('HttpAdapterService', () => {
-  let serviceUnderTest: Spy<HttpAdapterService>;
+  let serviceUnderTest: HttpAdapterService;
   let actualResult: any;
 
   // 1
@@ -22,7 +22,7 @@ describe('HttpAdapterService', () => {
       ]
     });
 
-    serviceUnderTest = TestBed.inject<any>(HttpAdapterService);
+    serviceUnderTest = TestBed.inject(HttpAdapterService);
     actualResult = undefined;
 
     // 9: 初始化 xhr-mock (假 server)

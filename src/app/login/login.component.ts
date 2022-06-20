@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'ld-login',
@@ -8,11 +8,19 @@ import { FormGroup } from '@angular/forms';
 })
 export class LoginComponent implements OnInit {
 
-  loginForm: FormGroup;
+  loginForm: FormGroup = new FormGroup({
+    email: new FormControl(),
+    password: new FormControl(),
+  });
 
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  // 4
+  handleLogin() {
+    throw new Error('Method not implemented');
   }
 
 }

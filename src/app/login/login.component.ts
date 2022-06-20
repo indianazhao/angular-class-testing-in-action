@@ -1,3 +1,4 @@
+import { LoginService } from './login.service';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 
@@ -13,14 +14,17 @@ export class LoginComponent implements OnInit {
     password: new FormControl(),
   });
 
-  constructor() { }
+  constructor(
+    private loginService: LoginService,
+  ) { }
 
   ngOnInit(): void {
   }
 
   // 4
   handleLogin() {
-    throw new Error('Method not implemented');
+    const credentials = this.loginForm.value;
+    this.loginService.login(credentials);
   }
 
 }

@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Llama } from 'src/app/_types/llama.type';
 
@@ -6,10 +7,11 @@ import { Llama } from 'src/app/_types/llama.type';
 })
 export class HttpAdapterService {
 
-  constructor() { }
+  constructor(
+    private httpClient: HttpClient,
+  ) { }
 
-  // TODO: TEST
   patch<T>(url: string, changes: Partial<Llama>): Promise<T> {
-    throw new Error('Method not implemented.');
+    return this.httpClient.patch<T>(url, changes).toPromise();
   }
 }

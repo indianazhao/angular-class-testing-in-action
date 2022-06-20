@@ -22,7 +22,6 @@ export class LlamaRemoteService {
   }
 
   update(llamaId: string, changes: Partial<Llama>): Promise<Llama> {
-    throw new Error('UNEXPECTED ERRRRRRROR!!!!');
     const url = `${LLAMAS_REMOTE_PATH}/${llamaId}`;
     return this.httpAdapterService.patch(url, changes);
   }

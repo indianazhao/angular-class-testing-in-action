@@ -81,7 +81,7 @@ describe('LlamaRemoteService', () => {
 
         // TODO: 目前這兩行沒加也無所謂，因為 expect 那邊也會成立。之後等 http adapter 的 patch 實作後，來看看不加上這兩行是否會出錯。
         expectedReturnedLlama.id = fakeLlamaIdArg;
-        expectedReturnedLlama.pokedByTheseLlamas = ['FAKE LLAMA USER ID']
+        expectedReturnedLlama.pokedByTheseLlamas = ['FAKE LLAMA USER ID'];
 
         const expectedUrl = `${LLAMAS_REMOTE_PATH}/${fakeLlamaIdArg}`;
         httpAdapterServiceSpy.patch

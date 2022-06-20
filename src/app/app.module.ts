@@ -7,6 +7,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { LlamaRemoteService } from './_services/llama-remote/llama-remote.service';
 import { RouterModule } from '@angular/router';
 import { LlamaPageComponent } from './llama-page/llama-page.component';
+import { LoginComponent } from './login/login.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 @NgModule({
@@ -14,11 +16,13 @@ import { LlamaPageComponent } from './llama-page/llama-page.component';
     BrowserModule,
     HttpClientModule,
     RouterModule.forRoot(APP_ROUTES),
+    ReactiveFormsModule,
   ],
   declarations: [
     AppComponent,
     FrontComponent,
-    LlamaPageComponent
+    LlamaPageComponent,
+    LoginComponent
   ],
   providers: [],
   bootstrap: [AppComponent]

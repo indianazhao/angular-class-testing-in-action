@@ -8,6 +8,7 @@ import { LoginService } from './login.service';
 describe('LoginComponent', () => {
   let componentUnderTest: LoginComponent;
   let loginServiceSpy: Spy<LoginService>;
+  let fakeValue: string;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -22,6 +23,37 @@ describe('LoginComponent', () => {
 
     componentUnderTest = TestBed.inject(LoginComponent);
     loginServiceSpy = TestBed.inject<any>(LoginService);
+    fakeValue = undefined;
+  });
+
+  // 1
+  describe('EVENT: email changed', () => {
+    // 2
+    When(() => {
+      componentUnderTest.emailControl.setValue(fakeValue);
+    });
+
+    // 針對 email 的某種 validation 進行測試，寫完後可以複製/貼上，修改成另一個 email validation
+    // 3
+    describe('GIVEN email is empty THEN email validation should fail', () => {
+      Given(() => {
+        fakeValue = '';
+      });
+      Then(() => {
+        expect(componentUnderTest.emailControl.valid).toBeFalsy();
+      });
+    });
+
+    // 5
+    describe('GIVEN email is not a valid email address THEN email validation should fail', () => {
+      Given(() => {
+        fakeValue = 'NOT A EMAIL';
+      });
+      Then(() => {
+        expect(componentUnderTest.emailControl.valid).toBeFalsy();
+      });
+    });
+
   });
 
   describe('Method: handleLogin', () => {
@@ -34,22 +66,15 @@ describe('LoginComponent', () => {
     describe('GIVEN form data is valid THEN pass credentials to the service', () => {
 
       Given(() => {
-        // form data is valid
-
-        // 1
         fakeCredentials = {
-          email: 'FAKE EMAIL',
+          email: 'FAKE@EMAIL.com',  // 7
           password: 'FAKE PASSWORD',
         };
 
-        // 2
         componentUnderTest.loginForm.setValue(fakeCredentials);
       });
 
       Then(() => {
-        // pass credentials to the service
-
-        // 3
         expect(loginServiceSpy.login).toHaveBeenCalledWith(fakeCredentials);
       });
     });
@@ -66,7 +91,8 @@ describe('LoginComponent', () => {
       });
 
       Then(() => {
-        expect(loginServiceSpy.login).not.toHaveBeenCalledWith(fakeCredentials);
+        // 這裡其實只要確認 login 沒被呼叫即可，根本不需要判斷是否沒被呼叫特定參數
+        expect(loginServiceSpy.login).not.toHaveBeenCalled();
       });
     });
 

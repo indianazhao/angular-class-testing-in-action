@@ -1,14 +1,14 @@
-import { APP_ROUTES } from './app.routes';
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { APP_ROUTES } from './app.routes';
 import { AppComponent } from './app.component';
 import { FrontComponent } from './front/front.component';
-import { HttpClientModule } from '@angular/common/http';
-import { LlamaRemoteService } from './_services/llama-remote/llama-remote.service';
-import { RouterModule } from '@angular/router';
 import { LlamaPageComponent } from './llama-page/llama-page.component';
 import { LoginComponent } from './login/login.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { RegistrationComponent } from './registration/registration.component';
 
 
 @NgModule({
@@ -22,7 +22,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     AppComponent,
     FrontComponent,
     LlamaPageComponent,
-    LoginComponent
+    LoginComponent,
+    RegistrationComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

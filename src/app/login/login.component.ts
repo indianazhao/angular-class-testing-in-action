@@ -1,3 +1,4 @@
+import { appRoutesNames } from './../app.routes.names';
 import { LoginService } from './login.service';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
@@ -8,6 +9,9 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
+
+  // 3
+  registerLink = `/${appRoutesNames.REGISTER}`;
 
   loginForm: FormGroup = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),

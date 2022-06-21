@@ -1,3 +1,4 @@
+import { appRoutesNames } from './../app.routes.names';
 import { TestBed } from '@angular/core/testing';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { UserCredentials } from './../_types/user-credentials.type';
@@ -24,6 +25,14 @@ describe('LoginComponent', () => {
     componentUnderTest = TestBed.inject(LoginComponent);
     loginServiceSpy = TestBed.inject<any>(LoginService);
     fakeValue = undefined;
+  });
+
+  // 2: 新增變數 registerLink 的測試，這個測試的 action type = INIT
+  describe('INIT', () => {
+    Then(() => {
+      expect(componentUnderTest.registerLink).toEqual(`/${appRoutesNames.REGISTER}`)
+    });
+
   });
 
   describe('EVENT: email changed', () => {

@@ -32,6 +32,14 @@
 
       <button class="btn btn-primary mt-3"
               (click)="handleLogin()">Login</button>
+
+      <div class="mb-4"></div>
+
+      <!-- 1: 我們要加上註冊帳號的連結，先寫出 DOM 元件，再去新增變數的測試 -->
+      <a [routerLink]="[registerLink]"
+         routerLinkActive="router-link-active">
+         I don't have an account :(
+      </a>
     </form>
 
   </div>

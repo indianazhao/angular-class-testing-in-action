@@ -10,9 +10,8 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 export class LoginComponent implements OnInit {
 
   loginForm: FormGroup = new FormGroup({
-    // 6
     email: new FormControl('', [Validators.required, Validators.email]),
-    password: new FormControl('', [Validators.required]),
+    password: new FormControl('', [Validators.required, Validators.minLength(8)]),
   });
 
   constructor(
@@ -22,10 +21,13 @@ export class LoginComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  // 4
   // 我們不喜歡「字串」，所以使用這個函式讓測試可以取得 email 的 formControl
   get emailControl(): AbstractControl{
     return this.loginForm.get('email');
+  }
+
+  get passwordControl(): AbstractControl{
+    return this.loginForm.get('password');
   }
 
   handleLogin() {

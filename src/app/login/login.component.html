@@ -1,19 +1,36 @@
 <div class="row justify-content-center mt-4">
-  <div class="card p-4 col-lg-4 mt-4">
+  <div class="card p-4 col-lg-5 mt-4">
     <h3 class="mb-4">Login</h3>
 
     <form [formGroup]="loginForm">
 
       <input type="text"
-             class="form-control mb-3"
+             class="form-control"
              placeholder="Email"
              formControlName="email">
+
+      <div *ngIf="emailControl.invalid && emailControl.touched"
+           class="text-danger">
+        <span *ngIf="emailControl.errors['required']">Email is required</span>
+        <span *ngIf="emailControl.errors['email']">This should be a valid email address</span>
+      </div>
+
+      <div class="mb-3"></div>
+
       <input type="password"
-             class="form-control mb-3"
+             class="form-control"
              placeholder="Password"
              formControlName="password">
 
-      <button class="btn btn-primary"
+      <div *ngIf="passwordControl.invalid && passwordControl.touched"
+           class="text-danger">
+        <span *ngIf="passwordControl.errors['required']">Password is required</span>
+        <span *ngIf="passwordControl.errors['minlength']">
+          Password should be at least {{ passwordControl.errors['minlength'].requiredLength }} characters long
+        </span>
+      </div>
+
+      <button class="btn btn-primary mt-3"
               (click)="handleLogin()">Login</button>
     </form>
 

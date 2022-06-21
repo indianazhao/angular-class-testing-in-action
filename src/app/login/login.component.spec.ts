@@ -26,15 +26,12 @@ describe('LoginComponent', () => {
     fakeValue = undefined;
   });
 
-  // 1
   describe('EVENT: email changed', () => {
-    // 2
     When(() => {
       componentUnderTest.emailControl.setValue(fakeValue);
     });
 
     // 針對 email 的某種 validation 進行測試，寫完後可以複製/貼上，修改成另一個 email validation
-    // 3
     describe('GIVEN email is empty THEN email validation should fail', () => {
       Given(() => {
         fakeValue = '';
@@ -44,7 +41,6 @@ describe('LoginComponent', () => {
       });
     });
 
-    // 5
     describe('GIVEN email is not a valid email address THEN email validation should fail', () => {
       Given(() => {
         fakeValue = 'NOT A EMAIL';
@@ -53,7 +49,30 @@ describe('LoginComponent', () => {
         expect(componentUnderTest.emailControl.valid).toBeFalsy();
       });
     });
+  });
 
+  describe('EVENT: password changed', () => {
+    When(() => {
+      componentUnderTest.passwordControl.setValue(fakeValue);
+    });
+
+    describe('GIVEN password is empty THEN password validation should fail', () => {
+      Given(() => {
+        fakeValue = '';
+      });
+      Then(() => {
+        expect(componentUnderTest.passwordControl.valid).toBeFalsy();
+      });
+    });
+
+    describe('GIVEN password is too short THEN password validation should fail', () => {
+      Given(() => {
+        fakeValue = '1234567';
+      });
+      Then(() => {
+        expect(componentUnderTest.passwordControl.valid).toBeFalsy();
+      });
+    });
   });
 
   describe('Method: handleLogin', () => {
@@ -67,7 +86,7 @@ describe('LoginComponent', () => {
 
       Given(() => {
         fakeCredentials = {
-          email: 'FAKE@EMAIL.com',  // 7
+          email: 'FAKE@EMAIL.com',
           password: 'FAKE PASSWORD',
         };
 

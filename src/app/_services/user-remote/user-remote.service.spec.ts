@@ -5,6 +5,10 @@ import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { HttpAdapterService } from '../adapters/http-adapter/http-adapter.service';
 import { UserRemoteService, USER_REMOTE_PATH } from './user-remote.service';
 
+// 這邊我們不如下直接 import 函式，而是透過 import * as 的方式把它包含在某個物件之下 (就像一個容器包含這個函式)，這樣我們就可以使用一個 spy (or mock) 去取代這個函式
+// import { getUserIdFromToken } from './get-user-id-from-token';
+import * as jwtDecoder from './get-user-id-from-token';
+
 describe('UserRemoteService', () => {
   let serviceUnderTest: UserRemoteService;
   let httpAdapterServiceSpy: Spy<HttpAdapterService>;
@@ -54,7 +58,12 @@ describe('UserRemoteService', () => {
             accessToken: accessTokenWithUserIdOf2,
           });
 
-        });
+        // 為了避免 getUserIdFromToken 破壞 isolation，必須進行 spy (mock) 測試！
+        spyOn(jwtDecoder, 'getUserIdFromToken')
+          .withArgs(accessTokenWithUserIdOf2)
+          .and.returnValue(expectedUserId);
+      });
+
       Then(() => {
         expect(actualResult).toEqual(expectedUserId);
       });

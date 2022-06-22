@@ -13,6 +13,4 @@ describe('getUserIdFromToken', () => {
     expect(actualResult).toEqual(expectedUserId);
   });
 
-
-
 });

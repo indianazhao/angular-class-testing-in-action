@@ -1,3 +1,4 @@
+import { UserCredentials } from './../../../_types/user-credentials.type';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Llama } from 'src/app/_types/llama.type';
@@ -11,7 +12,12 @@ export class HttpAdapterService {
     private httpClient: HttpClient,
   ) { }
 
-  patch<T>(url: string, changes: Partial<Llama>): Promise<T> {
-    return this.httpClient.patch<T>(url, changes).toPromise();
+  patch<T>(url: string, body: any): Promise<T> {
+    return this.httpClient.patch<T>(url, body).toPromise();
+  }
+
+  // TODO: TEST
+  post<T>(url: string, body: any): Promise<T> {
+    throw new Error('Method not implemented.');
   }
 }

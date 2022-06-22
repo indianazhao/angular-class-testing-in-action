@@ -1,6 +1,6 @@
 import { RegistrationDetails } from './../_types/registration-details.type';
 import { appRoutesNames } from './../app.routes.names';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
 import { RegistrationService } from './registration.service';
@@ -36,9 +36,9 @@ describe('RegistrationService', () => {
   describe('METHOD: registerNewUser', () => {
     let fakeRegistrationDetails: RegistrationDetails;
 
-    When(() => {
+    When(fakeAsync(() => {
       serviceUnderTest.registerNewUser(fakeRegistrationDetails);
-    });
+    }));
 
     describe('GIVEN user and llama created successfully THEN then redirect to login', () => {
       Given(() => {
@@ -63,7 +63,7 @@ describe('RegistrationService', () => {
           .resolveWith(returnedUserId);
 
         const llamaWithUserId = {
-          ...fakeRegistrationDetails,
+          ...fakeRegistrationDetails.llama,
           userId: returnedUserId,
         };
 
@@ -75,7 +75,7 @@ describe('RegistrationService', () => {
       });
       Then(() => {
         // then redirect to login
-        expect(routerAdapterServiceSpy.goToUrl).toHaveBeenCalledWith(`${appRoutesNames.LOGIN}`);
+        expect(routerAdapterServiceSpy.goToUrl).toHaveBeenCalledWith(`/${appRoutesNames.LOGIN}`);
       });
     });
 

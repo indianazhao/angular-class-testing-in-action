@@ -33,19 +33,16 @@ describe('RegistrationService', () => {
     actualResult = undefined;
   });
 
-  // 1
   describe('METHOD: registerNewUser', () => {
     let fakeRegistrationDetails: RegistrationDetails;
 
-    // 2
     When(() => {
       serviceUnderTest.registerNewUser(fakeRegistrationDetails);
     });
 
-    // 3
     describe('GIVEN user and llama created successfully THEN then redirect to login', () => {
       Given(() => {
-        // 5: user and llama created successfully
+        // user and llama created successfully
         fakeRegistrationDetails = {
           user: {
             email: 'fake@fake.com',
@@ -57,17 +54,27 @@ describe('RegistrationService', () => {
           },
         };
 
-        // 6: CREATE USER -> create UserRemoteService (類似 LlamaRemoteService)
+        // 為了簡化程式 (不考慮 token 如何取回 user id 等)，我們讓 userRemoveService 回傳的 token 改成 user id
+        const returnedUserId: number = 12345;
+
+        // CREATE USER -> create UserRemoteService (類似 LlamaRemoteService)
         userRemoteServiceSpy.create
           .mustBeCalledWith(fakeRegistrationDetails.user)
-          .resolveWith(fakeToken);
+          .resolveWith(returnedUserId);
 
-        // 7: CREATE LLAMA and connect it
-        llamaRemoteServiceSpy.create.mustBeCalledWith(llamaWithUserId);
+        const llamaWithUserId = {
+          ...fakeRegistrationDetails,
+          userId: returnedUserId,
+        };
+
+        // CREATE LLAMA and connect it (建立 llama [暱稱 + 大頭照] 並把 user id 跟 llama 關聯起來)
+        llamaRemoteServiceSpy.create
+          .mustBeCalledWith(llamaWithUserId)
+          .resolveWith();
 
       });
       Then(() => {
-        // 4: then redirect to login
+        // then redirect to login
         expect(routerAdapterServiceSpy.goToUrl).toHaveBeenCalledWith(`${appRoutesNames.LOGIN}`);
       });
     });

@@ -9,7 +9,8 @@ export class UserRemoteService {
   constructor() { }
 
   // TODO: TEST
-  create(credentials: UserCredentials): Promise<string> {
+  // 因為 json-server 使用的 resource id 是 number，所以這邊原本是 token string，改成 user id number
+  create(credentials: UserCredentials): Promise<number> {
     throw new Error('Method not implemented.');
   }
 }

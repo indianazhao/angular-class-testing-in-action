@@ -27,7 +27,7 @@ describe('LoginComponent', () => {
     fakeValue = undefined;
   });
 
-  // 2: 新增變數 registerLink 的測試，這個測試的 action type = INIT
+  // 新增變數 registerLink 的測試，這個測試的 action type = INIT
   describe('INIT', () => {
     Then(() => {
       expect(componentUnderTest.registerLink).toEqual(`/${appRoutesNames.REGISTER}`)
@@ -84,7 +84,7 @@ describe('LoginComponent', () => {
     });
   });
 
-  describe('Method: handleLogin', () => {
+  describe('METHOD: handleLogin', () => {
     let fakeCredentials: UserCredentials;
 
     When(() => {

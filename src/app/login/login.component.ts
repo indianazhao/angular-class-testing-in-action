@@ -1,7 +1,8 @@
-import { appRoutesNames } from './../app.routes.names';
-import { LoginService } from './login.service';
 import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
+import { appRoutesNames } from './../app.routes.names';
+import { LoginService } from './login.service';
+import { UserCredentials } from '../_types/user-credentials.type';
 
 @Component({
   selector: 'ld-login',
@@ -10,7 +11,6 @@ import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/fo
 })
 export class LoginComponent implements OnInit {
 
-  // 3
   registerLink = `/${appRoutesNames.REGISTER}`;
 
   loginForm: FormGroup = new FormGroup({
@@ -36,7 +36,7 @@ export class LoginComponent implements OnInit {
 
   handleLogin() {
     if (this.loginForm.valid) {
-      const credentials = this.loginForm.value;
+      const credentials: UserCredentials = this.loginForm.value;
       this.loginService.login(credentials);
     }
   }

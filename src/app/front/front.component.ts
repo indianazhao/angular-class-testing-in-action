@@ -1,8 +1,8 @@
-import { appRoutesNames } from './../app.routes.names';
 import { Component, OnInit } from '@angular/core';
-import { FrontService } from './front.service';
+import { Observable } from 'rxjs';
+import { appRoutesNames } from './../app.routes.names';
 import { Llama } from '../_types/llama.type';
-import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
+import { LlamaStateService } from '../_services/llama-state/llama-state.service';
 
 @Component({
   selector: 'ld-front',
@@ -12,30 +12,24 @@ import { RouterAdapterService } from '../_services/adapters/router-adapter/route
 export class FrontComponent implements OnInit {
 
   llamaPageLink = `/${appRoutesNames.LLAMA_PAGE}`;
-  llamas: Llama[];
   showErrorMessage: boolean;
+  featuredLlamas$: Observable<Llama[]>;
 
   constructor(
-    private frontService: FrontService,
-    private router: RouterAdapterService
+    private llamaStateService: LlamaStateService
   ) { }
 
   ngOnInit() {
-    return this.frontService.getFeaturedLlamas({newest: true}).then(
-      result => {
-        this.llamas = result;
-      },
-      error => {
-        this.showErrorMessage = true;
-      }
-    );
+    this.featuredLlamas$ = this.llamaStateService.getFeaturedLlamas$();
   }
 
-  isListVisible(): boolean {
-    return !!this.llamas && this.llamas.length > 0;
+  isListVisible(llamas: Llama[]): boolean {
+    return !!llamas && llamas.length > 0;
   }
 
+  // TODO: handle errors?
   poke(llama: Llama) {
-    this.frontService.pokeLlama(llama);
+    this.llamaStateService.pokeLlama(llama);
   }
+
 }

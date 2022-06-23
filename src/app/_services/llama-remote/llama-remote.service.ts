@@ -3,8 +3,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Llama } from '../../_types/llama.type';
+import { map } from 'rxjs/operators';
 
 export const LLAMAS_REMOTE_PATH = '/api/llamas';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +18,7 @@ export class LlamaRemoteService {
 
   }
 
-  // TODO: change url to /llama AND change to Adapter
+  // TODO: change url to /llamas AND change to Adapter
   getLlamasFromServer(): Observable<Llama[]> {
     return this.http.get<Llama[]>('/api/newestLlamas');
   }
@@ -26,8 +28,13 @@ export class LlamaRemoteService {
     return this.httpAdapterService.patch(url, changes);
   }
 
-  // TODO: TEST
   create(basicLlamaDetails: Partial<Llama>): Promise<Llama> {
-    throw new Error('Method not implemented.');
+    return this.httpAdapterService.post(LLAMAS_REMOTE_PATH, basicLlamaDetails);
+  }
+
+  getByUserId(userId: number): Observable<Llama> {
+    const url = LLAMAS_REMOTE_PATH + '?userId=' + userId;
+    return this.httpAdapterService.get<Llama[]>(url)
+      .pipe(map(results => results[0]));
   }
 }

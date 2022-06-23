@@ -1,33 +1,27 @@
-import { Llama } from '../_types/llama.type';
-import { TestBed, fakeAsync, tick, flushMicrotasks } from '@angular/core/testing';
-import { FrontComponent } from './front.component';
-import { FrontService } from './front.service';
-
+import { TestBed, fakeAsync } from '@angular/core/testing';
 import { createSpyFromClass, Spy } from 'jasmine-auto-spies';
-import { RouterAdapterService } from '../_services/adapters/router-adapter/router-adapter.service';
+import { Llama } from '../_types/llama.type';
+import { FrontComponent } from './front.component';
+import { LlamaStateService } from '../_services/llama-state/llama-state.service';
 
 describe('FrontComponent', () => {
   let componentUnderTest: FrontComponent;
   let actualResult: any;
-  let frontServiceSpy: Spy<FrontService>;
+  let llamaStateServiceSpy: Spy<LlamaStateService>;
+  let fakeLlamas: Llama[];
 
   Given(() => {
     TestBed.configureTestingModule({
       providers: [
         FrontComponent,
-        {
-          provide: FrontService,
-          useValue: createSpyFromClass(FrontService)
-        },
-        {
-          provide: RouterAdapterService,
-          useValue: createSpyFromClass(RouterAdapterService)
-        }
+        { provide: LlamaStateService, useValue: createSpyFromClass(LlamaStateService) }
       ]
     });
 
     componentUnderTest = TestBed.inject(FrontComponent);
-    frontServiceSpy = TestBed.inject(FrontService) as Spy<FrontService>;
+    llamaStateServiceSpy = TestBed.inject<any>(LlamaStateService);
+
+    fakeLlamas = undefined;
   });
 
   describe('INIT', () => {
@@ -37,38 +31,37 @@ describe('FrontComponent', () => {
       })
     );
 
-    describe('GIVEN there are llamas THEN store the result', () => {
+    describe('GIVEN featured llamas emit THEN verify local subscription', () => {
       Given(() => {
-        frontServiceSpy.getFeaturedLlamas
-          .mustBeCalledWith({ newest: true })
-          .resolveWith([createDefaultFakeLlama()]);
+        fakeLlamas = [createDefaultFakeLlama()];
+
+        llamaStateServiceSpy.getFeaturedLlamas$.and.nextOneTimeWith(fakeLlamas);
+      });
+
+      When(() => {
+        componentUnderTest.featuredLlamas$.subscribe(value => (actualResult = value));
       });
 
       Then(() => {
-        expect(componentUnderTest.llamas.length).toBeGreaterThan(0);
-      });
-    });
-
-    describe(`GIVEN there is a problem fetching the llamas
-              THEN show an error`, () => {
-      Given(() => {
-        frontServiceSpy.getFeaturedLlamas.and.rejectWith();
-      });
-
-      Then(() => {
-        expect(componentUnderTest.showErrorMessage).toBeTruthy();
+        expect(actualResult).toEqual(fakeLlamas);
       });
     });
   });
 
   describe('METHOD: isListVisible', () => {
     When(() => {
-      actualResult = componentUnderTest.isListVisible();
+      actualResult = componentUnderTest.isListVisible(fakeLlamas);
     });
 
     describe('GIVEN there are llamas THEN return true', () => {
       Given(() => {
-        componentUnderTest.llamas = [createDefaultFakeLlama()];
+        fakeLlamas = [
+          {
+            id: 'fake id',
+            name: 'Billy',
+            imageFileName: 'fakeImage.jpg'
+          }
+        ];
       });
       Then(() => {
         expect(actualResult).toEqual(true);
@@ -77,16 +70,7 @@ describe('FrontComponent', () => {
 
     describe('GIVEN there are no llamas THEN return false', () => {
       Given(() => {
-        componentUnderTest.llamas = [];
-      });
-      Then(() => {
-        expect(actualResult).toEqual(false);
-      });
-    });
-
-    describe('GIVEN there is an error THEN return false', () => {
-      Given(() => {
-        componentUnderTest.showErrorMessage = true;
+        fakeLlamas = [];
       });
       Then(() => {
         expect(actualResult).toEqual(false);
@@ -94,23 +78,23 @@ describe('FrontComponent', () => {
     });
   });
 
-  describe('Method: poke', () => {
+  describe('METHOD: poke', () => {
     let fakeLlama: Llama;
+
     Given(() => {
       fakeLlama = createDefaultFakeLlama();
     });
+
     When(() => {
       componentUnderTest.poke(fakeLlama);
     });
 
     Then(() => {
-      expect(frontServiceSpy.pokeLlama).toHaveBeenCalledWith(fakeLlama);
+      expect(llamaStateServiceSpy.pokeLlama).toHaveBeenCalledWith(fakeLlama);
     });
-
   });
-
 });
 
-function createDefaultFakeLlama() {
+function createDefaultFakeLlama(): Llama {
   return { id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' };
 }

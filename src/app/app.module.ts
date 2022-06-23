@@ -9,6 +9,8 @@ import { FrontComponent } from './front/front.component';
 import { LlamaPageComponent } from './llama-page/llama-page.component';
 import { LoginComponent } from './login/login.component';
 import { RegistrationComponent } from './registration/registration.component';
+import { AppNotificationsComponent } from './app-notifications/app-notifications.component';
+import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -17,6 +19,7 @@ import { RegistrationComponent } from './registration/registration.component';
     HttpClientModule,
     RouterModule.forRoot(APP_ROUTES),
     ReactiveFormsModule,
+    NgbToastModule,
   ],
   declarations: [
     AppComponent,
@@ -24,6 +27,7 @@ import { RegistrationComponent } from './registration/registration.component';
     LlamaPageComponent,
     LoginComponent,
     RegistrationComponent,
+    AppNotificationsComponent,
   ],
   providers: [],
   bootstrap: [AppComponent]

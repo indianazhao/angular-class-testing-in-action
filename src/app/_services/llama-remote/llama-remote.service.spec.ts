@@ -12,6 +12,7 @@ describe('LlamaRemoteService', () => {
   let fakeLlamas: Llama[];
   let actualResult: any;
   let actualError: any;
+  let expectedReturnedLlama: Llama;
 
   Given(() => {
     TestBed.configureTestingModule({
@@ -29,6 +30,7 @@ describe('LlamaRemoteService', () => {
     fakeLlamas = undefined;
     actualResult = undefined;
     actualError = undefined;
+    expectedReturnedLlama = undefined;
   });
 
   describe('METHOD: getLlamasFromServer', () => {
@@ -56,7 +58,11 @@ describe('LlamaRemoteService', () => {
     let fakeLlamaChangesArg: Partial<Llama>;
     let errorIsExpected: boolean;
 
-    When(fakeAsync(async() => {
+    Given(() => {
+      errorIsExpected = false;
+    });
+
+    When(fakeAsync(async () => {
       try {
         actualResult = await serviceUnderTest.update(fakeLlamaIdArg, fakeLlamaChangesArg);
       } catch (error) {
@@ -68,20 +74,19 @@ describe('LlamaRemoteService', () => {
     }));
 
     describe('GIVEN update was successful THEN return the updated llama', () => {
-      let expectedReturnedLlama: Llama;
 
       Given(() => {
         // 資料從 front.service.spec.ts 複製出來...
         fakeLlamaIdArg = 'FAKE ID';
         fakeLlamaChangesArg = {
-          pokedByTheseLlamas: ['FAKE LLAMA USER ID'],
-        }
+          pokedByTheseLlamas: ['FAKE USER LLAMA ID'],
+        };
 
         expectedReturnedLlama = createDefaultFakeLlama();
 
         // TODO: 目前這兩行沒加也無所謂，因為 expect 那邊也會成立。之後等 http adapter 的 patch 實作後，來看看不加上這兩行是否會出錯。
         expectedReturnedLlama.id = fakeLlamaIdArg;
-        expectedReturnedLlama.pokedByTheseLlamas = ['FAKE LLAMA USER ID'];
+        expectedReturnedLlama.pokedByTheseLlamas = ['FAKE USER LLAMA ID'];
 
         const expectedUrl = `${LLAMAS_REMOTE_PATH}/${fakeLlamaIdArg}`;
         httpAdapterServiceSpy.patch
@@ -107,6 +112,64 @@ describe('LlamaRemoteService', () => {
         expect(actualError).toEqual('FAKE ERROR');
       });
     });
+  });
+
+  describe('METHOD: create', () => {
+    let fakeBasicLlamaDetails: Partial<Llama>;
+
+    Given(() => {
+      fakeBasicLlamaDetails = {
+        name: 'FAKE NAME',
+        imageFileName: 'FAKE IMAGE FILE NAME',
+        userId: 333333
+      };
+
+      expectedReturnedLlama = {
+        ...expectedReturnedLlama,
+        id: 'FAKE ID',
+        ...fakeBasicLlamaDetails
+      };
+
+      httpAdapterServiceSpy.post
+        .mustBeCalledWith(LLAMAS_REMOTE_PATH, fakeBasicLlamaDetails)
+        .resolveWith(expectedReturnedLlama);
+    });
+
+    When(fakeAsync(async () => {
+      actualResult = await serviceUnderTest.create(fakeBasicLlamaDetails);
+    }));
+
+    Then(() => {
+      expect(actualResult).toEqual(expectedReturnedLlama);
+    });
+
+  });
+
+  describe('METHOD: getByUserId', () => {
+    let fakeUserId: number;
+    let expectedReturnedUserLlama: Llama;
+
+    Given(() => {
+      fakeUserId = 33333333;
+
+      expectedReturnedUserLlama = createDefaultFakeLlama();
+      expectedReturnedUserLlama.userId = fakeUserId;
+
+      const url = LLAMAS_REMOTE_PATH + '?userId=' + fakeUserId;
+
+      httpAdapterServiceSpy.get.mustBeCalledWith(url)
+        .nextOneTimeWith([expectedReturnedUserLlama]);
+    });
+
+    When(() => {
+      serviceUnderTest.getByUserId(fakeUserId)
+        .subscribe(result => actualResult = result);
+    });
+
+    Then(() => {
+      expect(actualResult).toEqual(expectedReturnedUserLlama);
+    });
+
   });
 });
 

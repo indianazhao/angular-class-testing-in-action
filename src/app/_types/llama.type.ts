@@ -3,4 +3,5 @@ export interface Llama {
   name: string;
   imageFileName: string;
   pokedByTheseLlamas?: string[];
+  userId?: number;
 }

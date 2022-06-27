@@ -15,8 +15,16 @@
         </a>
       </div>
       <p>{{ llama.name }}</p>
-      <a routerLink="."
-         (click)="poke(llama)">Poke</a>
+
+      <div *ngIf="!llama.isPoked">
+        <a routerLink="."
+           (click)="poke(llama)">Poke</a>
+      </div>
+
+      <div *ngIf="llama.isPoked">
+        Poked!
+      </div>
+
     </div>
   </ng-container>
 </div>

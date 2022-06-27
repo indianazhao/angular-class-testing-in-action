@@ -33,19 +33,53 @@ describe('LlamaStateService', () => {
     actualResult = undefined;
   });
 
-  describe('METHOD: getFeaturedLlamas$', () => {
-    Given(() => {
-      fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
-      llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
-    });
+  function setupAndEmitUserLlamaWithId(userLlamaId: string) {
+    const fakeUserLlama = createDefaultFakeLlama();
+    fakeUserLlama.id = userLlamaId;
+    // 因為 userLlamaSubject() 是 private function，無法直接調用
+    // serviceUnderTest.userLlamaSubject.next(fakeUserLlama);
+    // 如果 tslint 出現錯誤，可以加入下面這行
+    // tslint:disable-next-line:no-string-literal
+    serviceUnderTest['userLlamaSubject'].next(fakeUserLlama);
+  }
 
+  describe('METHOD: getFeaturedLlamas$', () => {
     When(() => {
       serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
     });
 
-    Then(() => {
-      expect(actualResult).toEqual(fakeLlamas);
+    describe('GIVEN llamas loaded successfully from server THEN return them', () => {
+      Given(() => {
+        fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
+        llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
+      });
+
+      Then(() => {
+        expect(actualResult).toEqual(fakeLlamas);
+      });
     });
+
+    describe('GIVEN loaded llama is poked by user THEN decorate with isPoked', () => {
+      const fakeUserLlamaId = 'FAKE USER LLAMA ID';
+
+      Given(() => {
+        // userLlama id inside the pokedByTheseLlamas of the returned llama
+        const fakePokedLlama = createDefaultFakeLlama();
+        fakePokedLlama.pokedByTheseLlamas = [fakeUserLlamaId];  // 1. 我們只給 fakePokedLlama 指定了屬性 pokedByTheseLlamas
+        fakeLlamas = [fakePokedLlama];
+
+        // 3. 我們還需要去設定 serviceUnderTest 裡的 userLlamaSubject，才能讓其他函式知道目前的 user llama id
+        setupAndEmitUserLlamaWithId(fakeUserLlamaId);
+
+        llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
+      });
+
+      Then(() => {
+        const expectedPokedLlama: Llama = actualResult[0];  // 回傳的 actualResult[0] 應該就是 fakePokedLlama
+        expect(expectedPokedLlama.isPoked).toBe(true);  // 2. 測試目的看看屬性 isPoked 是否會變成 true
+      });
+    });
+
   });
 
   describe('METHOD: pokeLlama', () => {
@@ -58,12 +92,8 @@ describe('LlamaStateService', () => {
 
     describe('GIVEN user llama exists', () => {
       Given(() => {
-        const userLlama = createDefaultFakeLlama();
         fakeUserLlamaId = 'FAKE USER LLAMA ID';
-        userLlama.id = fakeUserLlamaId;
-
-        // tslint:disable-next-line:no-string-literal
-        serviceUnderTest['userLlamaSubject'].next(userLlama);
+        setupAndEmitUserLlamaWithId(fakeUserLlamaId);
       });
 
       describe('GIVEN llama with a empty pokedBy list THEN add user llama to the list', () => {

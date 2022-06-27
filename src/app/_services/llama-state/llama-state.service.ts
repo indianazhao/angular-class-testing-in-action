@@ -39,7 +39,11 @@ export class LlamaStateService {
 
   getFeaturedLlamas$(): Observable<Llama[]> {
     return this.llamaRemoteService
-      .getLlamasFromServer()
+      .getMany({
+        filters: {
+          featured: true
+        }
+      })
       .pipe(
         map(llamas => this.decorateWithIsPoked(llamas))
       );

@@ -1,9 +1,10 @@
 import { HttpAdapterService } from './../adapters/http-adapter/http-adapter.service';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Llama } from '../../_types/llama.type';
 import { map } from 'rxjs/operators';
+import { Llama } from '../../_types/llama.type';
+import { stringify } from 'query-string';
+import { QueryConfig } from 'src/app/_types/query-config.type';
 
 export const LLAMAS_REMOTE_PATH = '/api/llamas';
 
@@ -12,15 +13,18 @@ export const LLAMAS_REMOTE_PATH = '/api/llamas';
 })
 export class LlamaRemoteService {
   constructor(
-    private http: HttpClient,
     private httpAdapterService: HttpAdapterService,
   ) {
 
   }
 
-  // TODO: change url to /llamas AND change to Adapter
-  getLlamasFromServer(): Observable<Llama[]> {
-    return this.http.get<Llama[]>('/api/newestLlamas');
+  getMany(queryConfig?: QueryConfig): Observable<Llama[]> {
+    let url = LLAMAS_REMOTE_PATH;
+    if (queryConfig && queryConfig.filters) {
+      const queryParams = stringify(queryConfig.filters);
+      url += '?' + queryParams;
+    }
+    return this.httpAdapterService.get<Llama[]>(url);
   }
 
   update(llamaId: string, changes: Partial<Llama>): Promise<Llama> {

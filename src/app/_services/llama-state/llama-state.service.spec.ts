@@ -5,6 +5,7 @@ import { LlamaRemoteService } from '../llama-remote/llama-remote.service';
 import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { appRoutesNames } from '../../app.routes.names';
 import { RouterAdapterService } from '../adapters/router-adapter/router-adapter.service';
+import { QueryConfig } from './../../_types/query-config.type';
 
 describe('LlamaStateService', () => {
   let serviceUnderTest: LlamaStateService;
@@ -44,6 +45,17 @@ describe('LlamaStateService', () => {
   }
 
   describe('METHOD: getFeaturedLlamas$', () => {
+
+    let expectedQueryConfig: QueryConfig;
+
+    Given(() => {
+      expectedQueryConfig = {
+        filters: {
+          featured: true
+        }
+      };
+    });
+
     When(() => {
       serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
     });
@@ -51,7 +63,9 @@ describe('LlamaStateService', () => {
     describe('GIVEN llamas loaded successfully from server THEN return them', () => {
       Given(() => {
         fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
-        llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
+        llamaRemoteServiceSpy.getMany
+          .mustBeCalledWith(expectedQueryConfig)
+          .nextOneTimeWith(fakeLlamas);
       });
 
       Then(() => {
@@ -71,7 +85,9 @@ describe('LlamaStateService', () => {
         // 3. 我們還需要去設定 serviceUnderTest 裡的 userLlamaSubject，才能讓其他函式知道目前的 user llama id
         setupAndEmitUserLlamaWithId(fakeUserLlamaId);
 
-        llamaRemoteServiceSpy.getLlamasFromServer.and.nextOneTimeWith(fakeLlamas);
+        llamaRemoteServiceSpy.getMany
+          .mustBeCalledWith(expectedQueryConfig)
+          .nextOneTimeWith(fakeLlamas);
       });
 
       Then(() => {

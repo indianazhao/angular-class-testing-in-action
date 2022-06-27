@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { produce } from 'immer';
 import { Llama } from '../../_types/llama.type';
@@ -13,6 +13,7 @@ import { appRoutesNames } from '../../app.routes.names';
 export class LlamaStateService {
 
   private userLlamaSubject: BehaviorSubject<Llama> = new BehaviorSubject(null);
+  private mutationSubject: Subject<void> = new Subject();
 
   constructor(
     private llamaRemoteService: LlamaRemoteService,
@@ -50,7 +51,7 @@ export class LlamaStateService {
   }
 
   // TODO: Handle Errors?
-  pokeLlama(llama: Llama) {
+  async pokeLlama(llama: Llama) {
     const userLlama = this.userLlamaSubject.getValue();
     if (!userLlama) {
       this.routerAdapterService.goToUrl(`/${appRoutesNames.LOGIN}`);
@@ -60,10 +61,11 @@ export class LlamaStateService {
     const pokedByClone = llama.pokedByTheseLlamas ? [...llama.pokedByTheseLlamas] : [];
     pokedByClone.push(userLlama.id);
 
-    this.llamaRemoteService.update(llama.id, {
+    await this.llamaRemoteService.update(llama.id, {
       pokedByTheseLlamas: pokedByClone
     });
 
+    this.mutationSubject.next();
   }
 
   getUserLlama$(): Observable<Llama> {

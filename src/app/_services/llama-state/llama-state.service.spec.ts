@@ -102,12 +102,18 @@ describe('LlamaStateService', () => {
     let fakeUserLlamaId: string;
     let fakeLlama: Llama;
 
-    When(() => {
+    When(fakeAsync(async () => {
       serviceUnderTest.pokeLlama(fakeLlama);
-    });
+    }));
 
     describe('GIVEN user llama exists', () => {
+
+      let mutationNextSpy: jasmine.Spy;
+
       Given(() => {
+        mutationNextSpy = jasmine.createSpy('mutationNext');
+        serviceUnderTest['mutationSubject'].next = mutationNextSpy;
+
         fakeUserLlamaId = 'FAKE USER LLAMA ID';
         setupAndEmitUserLlamaWithId(fakeUserLlamaId);
       });
@@ -125,6 +131,8 @@ describe('LlamaStateService', () => {
             fakeLlama.id,
             expectedChanges
           );
+
+          expect(mutationNextSpy).toHaveBeenCalled();
         });
       });
 
@@ -142,6 +150,8 @@ describe('LlamaStateService', () => {
             fakeLlama.id,
             expectedChanges
           );
+
+          expect(mutationNextSpy).toHaveBeenCalled();
         });
       });
     });

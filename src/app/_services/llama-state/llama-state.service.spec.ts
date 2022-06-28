@@ -6,6 +6,8 @@ import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { appRoutesNames } from '../../app.routes.names';
 import { RouterAdapterService } from '../adapters/router-adapter/router-adapter.service';
 import { QueryConfig } from './../../_types/query-config.type';
+// 9.
+import { ObserverSpy } from '@hirez_io/observer-spy';
 
 describe('LlamaStateService', () => {
   let serviceUnderTest: LlamaStateService;
@@ -47,8 +49,13 @@ describe('LlamaStateService', () => {
   describe('METHOD: getFeaturedLlamas$', () => {
 
     let expectedQueryConfig: QueryConfig;
+    // 10.
+    let observerSpy: ObserverSpy<Llama[]>;
 
     Given(() => {
+      // 11.
+      observerSpy = new ObserverSpy();
+
       expectedQueryConfig = {
         filters: {
           featured: true
@@ -56,11 +63,47 @@ describe('LlamaStateService', () => {
       };
     });
 
-    When(() => {
-      serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
+    // 4. 測試「觸發 mutation subject」的行為 (test link of this.mutationSubject.pipe)
+    describe(`GIVEN requests return successfully
+              WHEN subscribing AND triggering mutation subject once
+              THEN receive 2 output results`, () => {
+      Given(() => {
+        // 5. 我們不需要回傳 fake llamas 等內容，因為在最小化其他非測試區塊的原則下，我們不太關心回傳內容。
+        llamaRemoteServiceSpy.getMany.and.nextWith();
+      });
+
+      When(() => {
+        // 6. 複製面的 When() 內容
+        // serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
+        // 8. 上面的 actualResult = value 只會保留最後一次結果，所以要把 subscribe 內容改成 observerSpy，才能觀察 observable「所有」變化。
+        const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
+
+        // 7. 增加觸發行為
+        serviceUnderTest['mutationSubject'].next();
+
+        // 12. 養成好習慣，永遠要在 When 裡頭 unsubscribe subscription。
+        sub.unsubscribe();
+      });
+
+      Then(() => {
+        // 13. 在最小化其他非測試區塊的原則下，我們不太關心回傳內容。這裡我們只在乎收到 2 次輸出結果 (給值)。
+        /**
+         *  注意！這裡的 getValuesLength 為何會是 2？不是回傳的 llamas 陣列有兩個元素，而是 mutationSubject 會被「給值」2 次！
+         *  第一次是被訂閱時：const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
+         *  第二次是被 next 時：serviceUnderTest['mutationSubject'].next();
+         *  所以仔細檢查 observerSpy.getValues() 時，會看到陣列裡塞了兩個空值 [null, null]，因為我們在 Given() 裡給的是空 llamas。
+         *  如果我們再呼叫一次 next，就會有三個空值 [null, null, null]，這時 getValuesLength() 就是 3。
+         *  describe 裡頭的「2 output results」，就是兩個輸出結果的意思！
+         */
+        expect(observerSpy.getValuesLength()).toBe(2);
+      });
     });
 
-    describe('GIVEN llamas loaded successfully from server THEN return them', () => {
+    // 2. 修改說明 (增加 WEHN subscribing)
+    // 3. 因為這裡的測試只有考慮「訂閱並回傳資料」，沒有考慮到「觸發 mutation subject」的行為，所以要另外建立一個測試。
+    describe(`GIVEN llamas loaded successfully from server
+              WHEN subscribing
+              THEN return them`, () => {
       Given(() => {
         fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
         llamaRemoteServiceSpy.getMany
@@ -68,12 +111,20 @@ describe('LlamaStateService', () => {
           .nextOneTimeWith(fakeLlamas);
       });
 
+      // 1. 先把 When 從 describe 外移到內
+      When(() => {
+        serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
+      });
+
       Then(() => {
         expect(actualResult).toEqual(fakeLlamas);
       });
     });
 
-    describe('GIVEN loaded llama is poked by user THEN decorate with isPoked', () => {
+    // 2. 修改說明 (增加 WEHN subscribing)
+    describe(`GIVEN loaded llama is poked by user
+              WHEN subscribing
+              THEN decorate with isPoked`, () => {
       const fakeUserLlamaId = 'FAKE USER LLAMA ID';
 
       Given(() => {
@@ -88,6 +139,11 @@ describe('LlamaStateService', () => {
         llamaRemoteServiceSpy.getMany
           .mustBeCalledWith(expectedQueryConfig)
           .nextOneTimeWith(fakeLlamas);
+      });
+
+      // 1. 先把 When 從 describe 外移到內
+      When(() => {
+        serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
       });
 
       Then(() => {

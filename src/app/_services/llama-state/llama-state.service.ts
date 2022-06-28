@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, mergeMap } from 'rxjs/operators';
 import { produce } from 'immer';
 import { Llama } from '../../_types/llama.type';
 import { LlamaRemoteService } from '../llama-remote/llama-remote.service';
@@ -13,7 +13,7 @@ import { appRoutesNames } from '../../app.routes.names';
 export class LlamaStateService {
 
   private userLlamaSubject: BehaviorSubject<Llama> = new BehaviorSubject(null);
-  private mutationSubject: Subject<void> = new Subject();
+  private mutationSubject: BehaviorSubject<void> = new BehaviorSubject(null);
 
   constructor(
     private llamaRemoteService: LlamaRemoteService,
@@ -39,15 +39,16 @@ export class LlamaStateService {
   }
 
   getFeaturedLlamas$(): Observable<Llama[]> {
-    return this.llamaRemoteService
-      .getMany({
-        filters: {
-          featured: true
-        }
-      })
-      .pipe(
-        map(llamas => this.decorateWithIsPoked(llamas))
-      );
+    return this.mutationSubject.pipe(
+      mergeMap(_ =>
+        this.llamaRemoteService.getMany({
+          filters: {
+            featured: true
+          }
+        })
+      ),
+      map(llamas => this.decorateWithIsPoked(llamas))
+    );
   }
 
   // TODO: Handle Errors?

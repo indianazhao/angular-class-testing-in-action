@@ -6,7 +6,6 @@ import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { appRoutesNames } from '../../app.routes.names';
 import { RouterAdapterService } from '../adapters/router-adapter/router-adapter.service';
 import { QueryConfig } from './../../_types/query-config.type';
-// 9.
 import { ObserverSpy } from '@hirez_io/observer-spy';
 
 describe('LlamaStateService', () => {
@@ -49,11 +48,9 @@ describe('LlamaStateService', () => {
   describe('METHOD: getFeaturedLlamas$', () => {
 
     let expectedQueryConfig: QueryConfig;
-    // 10.
     let observerSpy: ObserverSpy<Llama[]>;
 
     Given(() => {
-      // 11.
       observerSpy = new ObserverSpy();
 
       expectedQueryConfig = {
@@ -63,30 +60,28 @@ describe('LlamaStateService', () => {
       };
     });
 
-    // 4. 測試「觸發 mutation subject」的行為 (test link of this.mutationSubject.pipe)
+    // 測試「觸發 mutation subject」的行為 (test link of this.mutationSubject.pipe)
     describe(`GIVEN requests return successfully
               WHEN subscribing AND triggering mutation subject once
               THEN receive 2 output results`, () => {
       Given(() => {
-        // 5. 我們不需要回傳 fake llamas 等內容，因為在最小化其他非測試區塊的原則下，我們不太關心回傳內容。
+        // 不需要回傳 fake llamas 等內容，因為在最小化其他非測試區塊的原則下，我們不太關心回傳內容。
         llamaRemoteServiceSpy.getMany.and.nextWith();
       });
 
       When(() => {
-        // 6. 複製面的 When() 內容
-        // serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
-        // 8. 上面的 actualResult = value 只會保留最後一次結果，所以要把 subscribe 內容改成 observerSpy，才能觀察 observable「所有」變化。
+        // actualResult = value 只會保留最後一次結果，所以要把 subscribe 內容改成 observerSpy，才能觀察 observable「所有」變化。
         const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
 
-        // 7. 增加觸發行為
+        // 觸發行為
         serviceUnderTest['mutationSubject'].next();
 
-        // 12. 養成好習慣，永遠要在 When 裡頭 unsubscribe subscription。
+        // 養成好習慣，永遠要在 When 裡頭 unsubscribe subscription。
         sub.unsubscribe();
       });
 
       Then(() => {
-        // 13. 在最小化其他非測試區塊的原則下，我們不太關心回傳內容。這裡我們只在乎收到 2 次輸出結果 (給值)。
+        // 在最小化其他非測試區塊的原則下，我們不太關心回傳內容。這裡我們只在乎收到 2 次輸出結果 (給值)。
         /**
          *  注意！這裡的 getValuesLength 為何會是 2？不是回傳的 llamas 陣列有兩個元素，而是 mutationSubject 會被「給值」2 次！
          *  第一次是被訂閱時：const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
@@ -99,8 +94,6 @@ describe('LlamaStateService', () => {
       });
     });
 
-    // 2. 修改說明 (增加 WEHN subscribing)
-    // 3. 因為這裡的測試只有考慮「訂閱並回傳資料」，沒有考慮到「觸發 mutation subject」的行為，所以要另外建立一個測試。
     describe(`GIVEN llamas loaded successfully from server
               WHEN subscribing
               THEN return them`, () => {
@@ -111,7 +104,6 @@ describe('LlamaStateService', () => {
           .nextOneTimeWith(fakeLlamas);
       });
 
-      // 1. 先把 When 從 describe 外移到內
       When(() => {
         serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
       });
@@ -121,7 +113,6 @@ describe('LlamaStateService', () => {
       });
     });
 
-    // 2. 修改說明 (增加 WEHN subscribing)
     describe(`GIVEN loaded llama is poked by user
               WHEN subscribing
               THEN decorate with isPoked`, () => {
@@ -130,10 +121,10 @@ describe('LlamaStateService', () => {
       Given(() => {
         // userLlama id inside the pokedByTheseLlamas of the returned llama
         const fakePokedLlama = createDefaultFakeLlama();
-        fakePokedLlama.pokedByTheseLlamas = [fakeUserLlamaId];  // 1. 我們只給 fakePokedLlama 指定了屬性 pokedByTheseLlamas
+        fakePokedLlama.pokedByTheseLlamas = [fakeUserLlamaId];
         fakeLlamas = [fakePokedLlama];
 
-        // 3. 我們還需要去設定 serviceUnderTest 裡的 userLlamaSubject，才能讓其他函式知道目前的 user llama id
+        // 需要去設定 serviceUnderTest 裡的 userLlamaSubject，才能讓其他函式知道目前的 user llama id
         setupAndEmitUserLlamaWithId(fakeUserLlamaId);
 
         llamaRemoteServiceSpy.getMany
@@ -141,14 +132,13 @@ describe('LlamaStateService', () => {
           .nextOneTimeWith(fakeLlamas);
       });
 
-      // 1. 先把 When 從 describe 外移到內
       When(() => {
         serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
       });
 
       Then(() => {
-        const expectedPokedLlama: Llama = actualResult[0];  // 回傳的 actualResult[0] 應該就是 fakePokedLlama
-        expect(expectedPokedLlama.isPoked).toBe(true);  // 2. 測試目的看看屬性 isPoked 是否會變成 true
+        const expectedPokedLlama: Llama = actualResult[0];
+        expect(expectedPokedLlama.isPoked).toBe(true);
       });
     });
 

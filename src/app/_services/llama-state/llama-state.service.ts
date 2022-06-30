@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, BehaviorSubject, Subject, interval, merge } from 'rxjs';
 import { map, mergeMap, switchMap } from 'rxjs/operators';
 import { produce } from 'immer';
 import { Llama } from '../../_types/llama.type';
@@ -39,7 +39,11 @@ export class LlamaStateService {
   }
 
   getFeaturedLlamas$(): Observable<Llama[]> {
-    return this.mutationSubject.pipe(
+    // 除了 mutationSubject (按下 poke 會觸發撈資料) 外，我們 merge 了另一個會定時觸發的 observable，每隔一段時間就會去撈資料。
+    return merge(
+      this.mutationSubject,
+      interval(5000)
+    ).pipe(
       switchMap(_ =>
         this.llamaRemoteService.getMany({
           filters: {

@@ -96,7 +96,33 @@ describe('LlamaStateService', () => {
       });
     });
 
-    // 1. 我們嘗試使用 TDD 把 getFeaturedLlamas$ 裡的 mergeMap 改成 switchMap (避免發送多次請求，所以只有最後一次請求有效)
+    describe(`GIVEN requests return successfully
+              WHEN subscribing (1) AND interval time passes twice (2)
+              THEN receive 3 (1+2) output results`, () => {
+      Given(() => {
+        // 不需要回傳 fake llamas 等內容，因為在最小化其他非測試區塊的原則下，我們不太關心回傳內容。
+        llamaRemoteServiceSpy.getMany.and.nextWith();
+      });
+
+      When(fakeAsync(() => {
+        // actualResult = value 只會保留最後一次結果，所以要把 subscribe 內容改成 observerSpy，才能觀察 observable「所有」變化。
+        const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
+
+        // 每隔 5000ms 會觸發一次，我們等待 5000*2ms，所以期間應該會觸發 2 次
+        tick(5000 * 2);
+
+        // 養成好習慣，永遠要在 When 裡頭 unsubscribe subscription。
+        sub.unsubscribe();
+      }));
+
+      Then(() => {
+        // 在最小化其他非測試區塊的原則下，我們不太關心回傳內容。這裡我們只在乎收到 3 次輸出結果 (給值)。
+        // subscribe 會輸出一次，後續 interval 會再輸出 2 次，所以共 3 次。
+        expect(observerSpy.getValuesLength()).toBe(3);
+      });
+    });
+
+    // 我們嘗試使用 TDD 把 getFeaturedLlamas$ 裡的 mergeMap 改成 switchMap (避免發送多次請求，所以只有最後一次請求有效)
     describe(`GIVEN first remote call takes longer than the second
               WHEN triggered twice (subscribe + emit)
               THEN return just the second result`, () => {

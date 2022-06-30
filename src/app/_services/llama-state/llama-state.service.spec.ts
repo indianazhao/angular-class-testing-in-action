@@ -1,12 +1,14 @@
 import { LlamaStateService } from './llama-state.service';
-import { TestBed, fakeAsync } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ObserverSpy } from '@hirez_io/observer-spy';
+import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
+import { delay } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { Llama } from '../../_types/llama.type';
 import { LlamaRemoteService } from '../llama-remote/llama-remote.service';
-import { Spy, createSpyFromClass } from 'jasmine-auto-spies';
 import { appRoutesNames } from '../../app.routes.names';
 import { RouterAdapterService } from '../adapters/router-adapter/router-adapter.service';
 import { QueryConfig } from './../../_types/query-config.type';
-import { ObserverSpy } from '@hirez_io/observer-spy';
 
 describe('LlamaStateService', () => {
   let serviceUnderTest: LlamaStateService;
@@ -94,22 +96,45 @@ describe('LlamaStateService', () => {
       });
     });
 
-    describe(`GIVEN llamas loaded successfully from server
-              WHEN subscribing
-              THEN return them`, () => {
+    // 1. 我們嘗試使用 TDD 把 getFeaturedLlamas$ 裡的 mergeMap 改成 switchMap (避免發送多次請求，所以只有最後一次請求有效)
+    describe(`GIVEN first remote call takes longer than the second
+              WHEN triggered twice (subscribe + emit)
+              THEN return just the second result`, () => {
+      let firstResult: Llama[];
+      let secondResult: Llama[];
+
       Given(() => {
-        fakeLlamas = [{ id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' }];
+        // 我們不再關心 fake llama 內容為何，我們只在乎第一次回傳與第二次回傳結果，所以建立兩個 observables 分別執行完畢回傳的兩組結果
+        firstResult = [createDefaultFakeLlama(1)];
+        secondResult = [createDefaultFakeLlama(2)];
+
+        // 建立兩個 observables，第一個有延遲，第二個沒有。模擬 switchMap 是否有作用。
+        const firstObservableWithDelay = of(firstResult).pipe(delay(200));
+        const secondObservable = of(secondResult);
+
         llamaRemoteServiceSpy.getMany
-          .mustBeCalledWith(expectedQueryConfig)
-          .nextOneTimeWith(fakeLlamas);
+          // .mustBeCalledWith(expectedQueryConfig)
+          // .nextOneTimeWith(fakeLlamas);
+          // withArgs 是新版 jasmine.Spy 原生函式，可以取代 jasmine-auto-spies 的 mustBeCalledWith
+          .withArgs(expectedQueryConfig)
+          // jasmine-auto-spies 沒有實作回傳值，所以使用 jasmine.Spy 的 returnValues
+          .and.returnValues(firstObservableWithDelay, secondObservable);
       });
 
-      When(() => {
-        serviceUnderTest.getFeaturedLlamas$().subscribe(value => (actualResult = value));
-      });
+      When(fakeAsync(() => {
+        // subscribe()，會觸發第一次，也就是回傳第一個 observable: firstObservableWithDelay
+        const sub = serviceUnderTest.getFeaturedLlamas$().subscribe(observerSpy);
+        // next()，會觸發第二次，也就是回傳第二個 observable: secondObservable
+        serviceUnderTest['mutationSubject'].next();
+        // 這裡等待 200ms，是因為我們上面有 dealy(200)，我們想看看 200ms 後，是否真的只有輸出一次結果。
+        // (如果用 mergeMap，等待 200ms 後，會看到兩次輸出結果)
+        tick(200);
+        sub.unsubscribe();
+      }));
 
       Then(() => {
-        expect(actualResult).toEqual(fakeLlamas);
+        // 理論上，第一個 observable 因為延遲，會被第二個 observable 給覆蓋掉。(mergeMap 則是會看到兩個結果)
+        expect(observerSpy.getValues()).toEqual([secondResult]);
       });
     });
 
@@ -239,6 +264,10 @@ describe('LlamaStateService', () => {
   });
 });
 
-function createDefaultFakeLlama(): Llama {
-  return { id: 'FAKE ID', name: 'FAKE NAME', imageFileName: 'FAKE IMAGE' };
+function createDefaultFakeLlama(index?: number): Llama {
+  return {
+    id: `FAKE ID ${index}`,
+    name: `FAKE NAME ${index}`,
+    imageFileName: 'FAKE IMAGE'
+  };
 }

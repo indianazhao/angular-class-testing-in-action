@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, Subject } from 'rxjs';
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import { produce } from 'immer';
 import { Llama } from '../../_types/llama.type';
 import { LlamaRemoteService } from '../llama-remote/llama-remote.service';
@@ -40,7 +40,7 @@ export class LlamaStateService {
 
   getFeaturedLlamas$(): Observable<Llama[]> {
     return this.mutationSubject.pipe(
-      mergeMap(_ =>
+      switchMap(_ =>
         this.llamaRemoteService.getMany({
           filters: {
             featured: true

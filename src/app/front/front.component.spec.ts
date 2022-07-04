@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync } from '@angular/core/testing';
-import { createSpyFromClass, Spy } from 'jasmine-auto-spies';
+import { Spy, provideAutoSpy } from 'jasmine-auto-spies';
 import { Llama } from '../_types/llama.type';
 import { FrontComponent } from './front.component';
 import { LlamaStateService } from '../_services/llama-state/llama-state.service';
@@ -14,7 +14,9 @@ describe('FrontComponent', () => {
     TestBed.configureTestingModule({
       providers: [
         FrontComponent,
-        { provide: LlamaStateService, useValue: createSpyFromClass(LlamaStateService) }
+        // 可以使用 provideAutoSpy 快速取代下面這一行
+        // { provide: LlamaStateService, useValue: createSpyFromClass(LlamaStateService) }
+        provideAutoSpy(LlamaStateService),
       ]
     });
 

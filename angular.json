@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "llama-date": {
+    "angular-class-testing-in-action": {
       "root": "",
       "sourceRoot": "src",
       "projectType": "application",
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/llama-date",
+            "outputPath": "dist/angular-class-testing-in-action",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -88,16 +88,16 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "llama-date:build",
+            "browserTarget": "angular-class-testing-in-action:build",
             "proxyConfig": "proxy.conf.json"
           },
           "configurations": {
             "production": {
-              "browserTarget": "llama-date:build:production"
+              "browserTarget": "angular-class-testing-in-action:build:production"
             },
             "hmr": {
               "hmr": true,
-              "browserTarget": "llama-date:build:hmr",
+              "browserTarget": "angular-class-testing-in-action:build:hmr",
               "proxyConfig": "proxy.conf.json"
             }
           }
@@ -105,7 +105,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "llama-date:build"
+            "browserTarget": "angular-class-testing-in-action:build"
           }
         },
         "test": {
@@ -141,5 +141,5 @@
       }
     }
   },
-  "defaultProject": "llama-date"
+  "defaultProject": "angular-class-testing-in-action"
 }
